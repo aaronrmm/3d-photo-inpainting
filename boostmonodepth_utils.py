@@ -12,20 +12,21 @@ BOOST_INPUTS = "inputs"
 BOOST_OUTPUTS = "outputs"
 
 
-def run_boostmonodepth(img_names, src_folder, depth_folder):
+def run_boostmonodepth(image_paths, depth_folder):
 
-    if not isinstance(img_names, list):
-        img_names = [img_names]
+    if not isinstance(image_paths, list):
+        image_paths = [image_paths]
 
     # remove irrelevant files first
     clean_folder(os.path.join(BOOST_BASE, BOOST_INPUTS))
     clean_folder(os.path.join(BOOST_BASE, BOOST_OUTPUTS))
 
     tgt_names = []
-    for img_name in img_names:
-        base_name = os.path.basename(replace_ext(img_name, ".png"))
+    for image_path in image_paths:
+        base_name = os.path.basename(replace_ext(image_path, ".png"))
         input_file = os.path.join(BOOST_BASE, BOOST_INPUTS, base_name)
-        os.system(f"cp {img_name} {input_file}")
+        print(f"Copying{image_path} to {input_file}")
+        os.system(f"cp {image_path} {input_file}")
         tgt_names.append(base_name)
 
         # keep only the file name here.
@@ -35,8 +36,8 @@ def run_boostmonodepth(img_names, src_folder, depth_folder):
         f"cd {BOOST_BASE} && python run.py --Final --data_dir {BOOST_INPUTS}/  --output_dir {BOOST_OUTPUTS} --depthNet 0"
     )
 
-    for i, (img_name, tgt_name) in enumerate(zip(img_names, tgt_names)):
-        img = imageio.imread(img_name)
+    for i, (image_path, tgt_name) in enumerate(zip(image_paths, tgt_names)):
+        img = imageio.imread(image_path)
         H, W = img.shape[:2]
         scale = 640.0 / max(H, W)
 
