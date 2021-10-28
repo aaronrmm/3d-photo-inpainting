@@ -1137,7 +1137,11 @@ def get_MiDaS_samples(image_folder, depth_folder, config, specific=None, aft_cer
         sdict = samples[-1]
         sdict["depth_fi"] = os.path.join(depth_folder, os.path.splitext(seq_dir)[0] + config["depth_format"])
         sdict["ref_img_fi"] = os.path.join(image_folder, seq_dir)
-        H, W = imageio.imread(sdict["ref_img_fi"]).shape[:2]
+        try:
+            H, W = imageio.imread(sdict["ref_img_fi"]).shape[:2]
+        except ValueError as ve:
+            print("Failed to read", seq_dir)
+            continue
         sdict["int_mtx"] = np.array([[max(H, W), 0, W // 2], [0, max(H, W), H // 2], [0, 0, 1]]).astype(np.float32)
         if sdict["int_mtx"].max() > 1:
             sdict["int_mtx"][0, :] = sdict["int_mtx"][0, :] / float(W)
